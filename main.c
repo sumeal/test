@@ -128,10 +128,11 @@ void distance_to_wall(t_game *game, t_ray *ray)
         else
             ray->perp_wall_dist = (ray->map_y - game->player.pos_y + (1 - ray->step_y) / 2.0) / ray->ray_dir_y;
     }
-
+	/* safety check */
     if (ray->perp_wall_dist <= 0.0)
         ray->perp_wall_dist = 1e-6;
 
+	/* the wall is */
     ray->line_height = (int)(WIN_HEIGHT / ray->perp_wall_dist);
 
     ray->draw_start = -ray->line_height / 2 + WIN_HEIGHT / 2;
@@ -145,13 +146,13 @@ void distance_to_wall(t_game *game, t_ray *ray)
 void pick_texture(t_game *game, t_ray *ray)
 {
     if (ray->side == 0 && ray->ray_dir_x > 0)
-        ray->tex_num = 3; /* west */
+        ray->tex_num = 3; /* east */
     else if (ray->side == 0 && ray->ray_dir_x < 0)
-        ray->tex_num = 2; /* east */
+        ray->tex_num = 2; /* west */
     else if (ray->side == 1 && ray->ray_dir_y > 0)
-        ray->tex_num = 0; /* north */
+        ray->tex_num = 1; /* north */
     else
-        ray->tex_num = 1; /* south */
+        ray->tex_num = 0; /* south */
 
     ray->tex = &game->textures[ray->tex_num].img;
 }
@@ -171,10 +172,13 @@ void texture_and_coordinate(t_game *game, t_ray *ray)
     ray->tex_x = (int)(ray->wall_x * (double)ray->tex->width);
     if ((ray->side == 0 && ray->ray_dir_x > 0) || (ray->side == 1 && ray->ray_dir_y < 0))
         ray->tex_x = ray->tex->width - ray->tex_x - 1;
-    if (ray->tex_x < 0) ray->tex_x = 0;
+    if (ray->tex_x < 0)
+		ray->tex_x = 0;
     if (ray->tex_x >= ray->tex->width) ray->tex_x = ray->tex->width - 1;
 
+	/* how many steps of the pixel texture needed to cover the wall height, example if the texture is 50px and the screen is 100px, the step is 0.5*/
     ray->step = 1.0 * ray->tex->height / (double)ray->line_height;
+	/* compute where the position of the texture will start at the top (if its shrinked or expanded)*/
     ray->tex_pos = (ray->draw_start - WIN_HEIGHT / 2.0 + ray->line_height / 2.0) * ray->step;
 }
 
@@ -222,25 +226,17 @@ void    render_walls(t_game *game)
 }
 
 
-
-// --- Rendering (empty for now, you’ll add raycasting later) ---
-int	render_frame(t_game *game)
-{
-	render_ceiling_floor(game);
-	render_walls(game);
-	mlx_put_image_to_window(game->mlx, game->win, game->img.img, 0, 0);
-	return (0);
-}
-
 // --- Setup player defaults ---
 void	init_player(t_player *p)
 {
 	p->pos_x = 3.5;   // player position (x)
 	p->pos_y = 3.5;   // player position (y)
-	p->dir_x = -1.0;  // facing left (west)
+	p->dir_x = 1.0;  // facing left (west)
 	p->dir_y = 0.0;
 	p->plane_x = 0.0;
 	p->plane_y = 0.66; // FOV
+
+
 }
 
 // --- Setup mlx image buffer ---
@@ -253,6 +249,10 @@ void	init_image(t_game *game)
 			&game->img.endian);
 	game->img.width = WIN_WIDTH;
 	game->img.height = WIN_HEIGHT;
+	memset(game->keys, 0, sizeof(game->keys));
+	game->key_left = 0;
+	game->key_right = 0;
+
 }
 
 // --- Load one texture from XPM ---
@@ -310,6 +310,110 @@ void	init_map(t_game *game)
 	game->map_height = h;
 }
 
+void move_forward(t_game *game)
+{
+    if (game->map[(int)(game->player.pos_y)][(int)(game->player.pos_x + game->player.dir_x * MOVE_SPEED)] == '0')
+        game->player.pos_x += game->player.dir_x * MOVE_SPEED;
+    if (game->map[(int)(game->player.pos_y + game->player.dir_y * MOVE_SPEED)][(int)(game->player.pos_x)] == '0')
+        game->player.pos_y += game->player.dir_y * MOVE_SPEED;
+}
+
+void move_backward(t_game *game)
+{
+    if (game->map[(int)(game->player.pos_y)][(int)(game->player.pos_x - game->player.dir_x * MOVE_SPEED)] == '0')
+        game->player.pos_x -= game->player.dir_x * MOVE_SPEED;
+    if (game->map[(int)(game->player.pos_y - game->player.dir_y * MOVE_SPEED)][(int)(game->player.pos_x)] == '0')
+        game->player.pos_y -= game->player.dir_y * MOVE_SPEED;
+}
+
+void strafe_left(t_game *game)
+{
+    if (game->map[(int)(game->player.pos_y)][(int)(game->player.pos_x - game->player.plane_x * MOVE_SPEED)] == '0')
+        game->player.pos_x -= game->player.plane_x * MOVE_SPEED;
+    if (game->map[(int)(game->player.pos_y - game->player.plane_y * MOVE_SPEED)][(int)(game->player.pos_x)] == '0')
+        game->player.pos_y -= game->player.plane_y * MOVE_SPEED;
+}
+
+void strafe_right(t_game *game)
+{
+    if (game->map[(int)(game->player.pos_y)][(int)(game->player.pos_x + game->player.plane_x * MOVE_SPEED)] == '0')
+        game->player.pos_x += game->player.plane_x * MOVE_SPEED;
+    if (game->map[(int)(game->player.pos_y + game->player.plane_y * MOVE_SPEED)][(int)(game->player.pos_x)] == '0')
+        game->player.pos_y += game->player.plane_y * MOVE_SPEED;
+}
+
+
+void rotate_left(t_game *game)
+{
+    double old_dir_x = game->player.dir_x;
+    game->player.dir_x = game->player.dir_x * cos(ROT_SPEED) - game->player.dir_y * sin(ROT_SPEED);
+    game->player.dir_y = old_dir_x * sin(ROT_SPEED) + game->player.dir_y * cos(ROT_SPEED);
+
+    double old_plane_x = game->player.plane_x;
+    game->player.plane_x = game->player.plane_x * cos(ROT_SPEED) - game->player.plane_y * sin(ROT_SPEED);
+    game->player.plane_y = old_plane_x * sin(ROT_SPEED) + game->player.plane_y * cos(ROT_SPEED);
+}
+
+void rotate_right(t_game *game)
+{
+    double old_dir_x = game->player.dir_x;
+    game->player.dir_x = game->player.dir_x * cos(-ROT_SPEED) - game->player.dir_y * sin(-ROT_SPEED);
+    game->player.dir_y = old_dir_x * sin(-ROT_SPEED) + game->player.dir_y * cos(-ROT_SPEED);
+
+    double old_plane_x = game->player.plane_x;
+    game->player.plane_x = game->player.plane_x * cos(-ROT_SPEED) - game->player.plane_y * sin(-ROT_SPEED);
+    game->player.plane_y = old_plane_x * sin(-ROT_SPEED) + game->player.plane_y * cos(-ROT_SPEED);
+}
+
+int key_press(int keycode, t_game *game)
+{
+    if (keycode >= 0 && keycode < 256)
+        game->keys[keycode] = 1;
+
+    if (keycode == KEY_LEFT)
+        game->key_left = 1;
+    if (keycode == KEY_RIGHT)
+        game->key_right = 1;
+    return (0);
+}
+
+int key_release(int keycode, t_game *game)
+{
+    if (keycode >= 0 && keycode < 256)
+        game->keys[keycode] = 0;
+
+    if (keycode == KEY_LEFT)
+        game->key_left = 0;
+    if (keycode == KEY_RIGHT)
+        game->key_right = 0;
+    return (0);
+}
+
+
+// --- Rendering (empty for now, you’ll add raycasting later) ---
+int render_frame(t_game *game)
+{
+    /* movement keys (W/A/S/D are ASCII < 256 and safe to index) */
+    if (game->keys[KEY_W])    move_forward(game);
+    if (game->keys[KEY_S])    move_backward(game);
+    if (game->keys[KEY_A])    strafe_left(game);
+    if (game->keys[KEY_D])    strafe_right(game);
+
+    /* use explicit flags for arrows (you already set these in key_press/key_release) */
+    if (game->key_left)       rotate_right(game);
+    if (game->key_right)      rotate_left(game);
+
+    /* handle ESC on key press (avoid indexing keys[KEY_ESC] which is >256) */
+    /* if you prefer a flag for ESC, set it in key_press like key_left/right */
+
+    /* render */
+    render_ceiling_floor(game);
+    render_walls(game);
+    mlx_put_image_to_window(game->mlx, game->win, game->img.img, 0, 0);
+    return (0);
+}
+
+
 // --- Main ---
 int	main(void)
 {
@@ -336,6 +440,8 @@ int	main(void)
 
 	// Hooks
 	mlx_hook(game.win, 17, 0, close_window, &game);
+	mlx_hook(game.win, 2, 1L<<0, key_press, &game);
+	mlx_hook(game.win, 3, 1L<<1, key_release, &game);
 	mlx_loop_hook(game.mlx, render_frame, &game);
 
 	// Game loop

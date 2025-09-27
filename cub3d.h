@@ -3,12 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   cub3d.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muzz <muzz@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 09:48:59 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/09/25 12:27:41 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/09/27 19:20:55 by muzz             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef CUB3D_H
+#define CUB3D_H
+
+#define KEY_ESC     65307
+#define KEY_W       119
+#define KEY_A       97
+#define KEY_S       115
+#define KEY_D       100
+#define KEY_LEFT    65361
+#define KEY_RIGHT   65363
+#define MOVE_SPEED 0.05
+#define ROT_SPEED 0.05
+
 
 typedef struct s_img
 {
@@ -85,3 +99,5 @@ typedef struct s_game
 	int			key_left;
 	int			key_right;
 }	t_game;
+
+#endif
