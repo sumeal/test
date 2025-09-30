@@ -6,7 +6,7 @@
 /*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 09:48:59 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/09/30 09:37:44 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/09/30 11:39:27 by abin-moh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,15 @@
 #define KEY_RIGHT   65363
 #define MOVE_SPEED 0.05
 #define ROT_SPEED 0.05
+
+#define WIN_WIDTH 1980
+#define WIN_HEIGHT 1080
+
+#include <mlx.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h> // for memset, strlen
+#include <math.h>
 
 
 typedef struct s_img
@@ -99,5 +108,35 @@ typedef struct s_game
 	int			key_left;
 	int			key_right;
 }	t_game;
+
+/*render.c*/
+int		render_frame(t_game *game);
+int		render_movement(t_game *game);
+int		render_ceiling_floor(t_game *game);
+void	render_walls(t_game *game);
+
+/*dda.c*/
+int		init_ray(t_ray *ray);
+void	ray_setup(t_game *game, t_ray *ray, int x);
+void	ray_cont(t_game *game, t_ray *ray);
+void	dda_loop(t_game *game, t_ray *ray);
+void	distance_to_wall(t_game *game, t_ray *ray);
+
+/*dda2.c*/
+void	pick_texture(t_game *game, t_ray *ray);
+void	texture_and_coordinate(t_game *game, t_ray *ray);
+void	draw_vertical_line(t_game *game, t_ray *ray, int x);
+
+/*movement.c*/
+void	strafe_right(t_game *game);
+void	rotate_left(t_game *game);
+void	rotate_right(t_game *game);
+int		key_press(int keycode, t_game *game);
+int		key_release(int keycode, t_game *game);
+
+/*movement2.c*/
+void	move_forward(t_game *game);
+void	move_backward(t_game *game);
+void	strafe_left(t_game *game);
 
 #endif

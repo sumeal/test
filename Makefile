@@ -6,7 +6,7 @@
 #    By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/09/25 09:48:14 by abin-moh          #+#    #+#              #
-#    Updated: 2025/09/25 09:49:39 by abin-moh         ###   ########.fr        #
+#    Updated: 2025/09/30 11:38:44 by abin-moh         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,7 +18,13 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror -Imlx_linux
 
 # --- Sources & Objects ---
-SRCS = main.c
+SRCS = main.c \
+	   render.c \
+	   dda.c \
+	   dda2.c \
+	   movement.c \
+	   movement2.c
+	   
 OBJS = $(SRCS:.c=.o)
 
 # --- MiniLibX ---
