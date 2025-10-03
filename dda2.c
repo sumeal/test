@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dda2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: muzz <muzz@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 11:20:27 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/10/03 09:51:21 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/10/03 21:49:40 by muzz             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,6 @@ void texture_and_coordinate(t_game *game, t_ray *ray)
 		ray->tex_x = 0;
     if (ray->tex_x >= ray->tex->width)
         ray->tex_x = ray->tex->width - 1;
-    ray->step = 1.0 * ray->tex->height / (double)ray->line_height;
-    ray->tex_pos = (ray->draw_start - WIN_HEIGHT / 2.0 + ray->line_height / 2.0) * ray->step;
 }
 
 /*
@@ -75,20 +73,21 @@ void draw_vertical_line(t_game *game, t_ray *ray, int x)
     unsigned int    color;
     char            *tex_dst;
     int             y;
-    int             tex_y;
 
     if (!ray->tex || !ray->tex->addr)
         return ;
+    ray->step = 1.0 * ray->tex->height / (double)ray->line_height;
+    ray->tex_pos = (ray->draw_start - WIN_HEIGHT / 2.0 + ray->line_height / 2.0) * ray->step;
     y = ray->draw_start - 1;
     while (++y < ray->draw_end)
     {
-        tex_y = (int)ray->tex_pos;
-        if (tex_y < 0)
-            tex_y = 0;
-        if (tex_y >= ray->tex->height)
-            tex_y = ray->tex->height - 1;
+        ray->tex_y = (int)ray->tex_pos;
+        if (ray->tex_y < 0)
+            ray->tex_y = 0;
+        if (ray->tex_y >= ray->tex->height)
+            ray->tex_y = ray->tex->height - 1;
         ray->tex_pos += ray->step;
-        tex_dst = ray->tex->addr + (tex_y * ray->tex->line_length
+        tex_dst = ray->tex->addr + (ray->tex_y * ray->tex->line_length
                     + ray->tex_x * (ray->tex->bits_per_pixel / 8));
         color = *(unsigned int *)tex_dst;
         dst = game->img.addr + (y * game->img.line_length
