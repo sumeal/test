@@ -6,7 +6,7 @@
 /*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 11:10:53 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/09/30 11:27:14 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/10/02 13:29:41 by abin-moh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ int init_ray(t_ray *ray)
     set the camera angle (-1 to 1)
     determine the ray direction in x and y
     get the player coordinate
-    get the delta dist(distance to get to the next wall) 
+    
+    get the delta dist(distance the ray has to travel to
+    cross exactly one grid line in that axis direction) 
 */
 void	ray_setup(t_game *game, t_ray *ray, int x)
 {
@@ -58,6 +60,9 @@ void	ray_setup(t_game *game, t_ray *ray, int x)
     determine the step x and y based on the ray direction
     (for adding it to the equation later)
     determine the side dist x and y to start the dda
+    (distance from the player to the first grid boundary 
+    (either vertical or horizontal) in the ray’s direction)
+    
 */
 void    ray_cont(t_game *game, t_ray *ray)
 {

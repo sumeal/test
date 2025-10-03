@@ -6,7 +6,7 @@
 /*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 11:20:27 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/09/30 11:36:00 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/10/03 09:51:21 by abin-moh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,8 @@ void texture_and_coordinate(t_game *game, t_ray *ray)
         ray->tex_x = ray->tex->width - ray->tex_x - 1;
     if (ray->tex_x < 0)
 		ray->tex_x = 0;
-    if (ray->tex_x >= ray->tex->width) ray->tex_x = ray->tex->width - 1;
+    if (ray->tex_x >= ray->tex->width)
+        ray->tex_x = ray->tex->width - 1;
     ray->step = 1.0 * ray->tex->height / (double)ray->line_height;
     ray->tex_pos = (ray->draw_start - WIN_HEIGHT / 2.0 + ray->line_height / 2.0) * ray->step;
 }

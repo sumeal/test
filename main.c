@@ -1,11 +1,5 @@
 #include "cub3d.h"
 
-// --- Utility (if you don't have libft yet) ---
-static void	ft_bzero(void *s, size_t n)
-{
-	memset(s, 0, n);
-}
-
 // --- Close window ---
 int	close_window(t_game *game)
 {
@@ -22,7 +16,7 @@ void	init_player(t_player *p) /*mad*/
 	p->pos_y = 3.5;   // player position (y)
 	p->dir_x = 1.0;  // facing left (east)
 	p->dir_y = 0.0;
-	p->plane_x = 0.0;
+	p->plane_x = 0;
 	p->plane_y = 0.66; // FOV
 }
 
@@ -36,7 +30,7 @@ void	init_image(t_game *game)
 			&game->img.endian);
 	game->img.width = WIN_WIDTH;
 	game->img.height = WIN_HEIGHT;
-	memset(game->keys, 0, sizeof(game->keys));
+	ft_memset(game->keys, 0, sizeof(game->keys));
 	game->key_left = 0;
 	game->key_right = 0;
 
@@ -70,8 +64,8 @@ void	init_textures(t_game *game)
 // --- Default floor & ceiling colors ---
 void	init_colors(t_game *game)
 {
-	game->floor_color = 0x333333;   // dark gray
-	game->ceiling_color = 0x87CEEB; // sky blue
+	game->floor_color = 3355443;   // dark gray
+	game->ceiling_color = 8900331; // sky blue
 }
 
 // --- Default test map ---
@@ -90,7 +84,7 @@ char *default_map[] = {
 void	init_map(t_game *game)
 {
 	game->map = default_map;
-	game->map_width = strlen(default_map[0]);
+	game->map_width = ft_strlen(default_map[0]);
 	int h = 0;
 	while (default_map[h])
 		h++;

@@ -6,7 +6,7 @@
 /*   By: abin-moh <abin-moh@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 09:48:59 by abin-moh          #+#    #+#             */
-/*   Updated: 2025/09/30 11:39:27 by abin-moh         ###   ########.fr       */
+/*   Updated: 2025/10/03 11:06:45 by abin-moh         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,10 @@
 #define WIN_WIDTH 1980
 #define WIN_HEIGHT 1080
 
+#include "./libft/libft.h"
 #include <mlx.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h> // for memset, strlen
 #include <math.h>
 
 
