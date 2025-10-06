@@ -43,8 +43,8 @@ void	load_texture(t_game *game, t_texture *tex, char *path)
 			&tex->img.width, &tex->img.height);
 	if (!tex->img.img)
 	{
-		fprintf(stderr, "Error: failed to load texture %s\n", path);
-		exit(1);
+		printf("Error: failed to load texture %s\n", path);
+		exit(1);                                               //////////check exit fcuntion
 	}
 	tex->img.addr = mlx_get_data_addr(tex->img.img,
 			&tex->img.bits_per_pixel,
@@ -74,8 +74,8 @@ char *default_map[] = {
 	"1000000101",
 	"1000110001",
 	"1100000101",
-	"1000100001",
-	"1000000001",
+	"1000100111",
+	"1000000101",
 	"1111111111",
 	NULL
 };
@@ -102,12 +102,12 @@ int	main(void)
     /*mad*/
 	game.mlx = mlx_init();
 	if (!game.mlx)
-		return (fprintf(stderr, "Error: mlx_init failed\n"), 1);
+		return (printf("Error\nmlx_init failed\n"), 1);
 
 	// Create window
 	game.win = mlx_new_window(game.mlx, WIN_WIDTH, WIN_HEIGHT, "cub3D");
 	if (!game.win)
-		return (fprintf(stderr, "Error: mlx_new_window failed\n"), 1);
+		return (printf("Error\nmlx_new_window failed\n"), 1);
 
 	// Init
 	init_player(&game.player);
